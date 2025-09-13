@@ -38,6 +38,39 @@ let splits         = [];
 let isInPause      = false;
 let pauseRemaining = 0;
 
+let wakeLock = null;
+// API Wake Lock permet à une page web de demander au système de garder l’écran allumé
+async function requestWakeLock() {
+  if ('wakeLock' in navigator) {
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      console.log('Wake Lock activé');
+
+      wakeLock.addEventListener('release', () => {
+        console.log('Wake Lock relâché');
+      });
+
+      // Relancer le Wake Lock si l’onglet revient en focus
+      document.addEventListener('visibilitychange', () => {
+        if (wakeLock !== null && document.visibilityState === 'visible') {
+          requestWakeLock();
+        }
+      });
+
+    } catch (err) {
+      console.error(`Erreur Wake Lock : ${err.name}, ${err.message}`);
+    }
+  } else {
+    console.warn('Wake Lock API non supportée sur ce navigateur');
+  }
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(()   => console.log('Service Worker enregistré'))
+    .catch(err => console.error('Erreur SW', err));
+}
+
 // Utils
 function fmt(sec) {
   sec = Math.max(0, sec|0);
@@ -508,29 +541,30 @@ dirSel.addEventListener("change", () => { reset(); });
 });
 
 startBtn.addEventListener("click", start);
-// pauseBtn.addEventListener("click", pause);
-resetBtn.addEventListener("click", reset);
-roundBtn.addEventListener("click", roundPlus);
+  requestWakeLock(); // empêche la mise en veille
+  // pauseBtn.addEventListener("click", pause);
+  resetBtn.addEventListener("click", reset);
+  roundBtn.addEventListener("click", roundPlus);
 
-fullscreenBtn.addEventListener("click", () => {
-  const el = document.documentElement;
-  const timerCard = document.querySelector(".card:nth-of-type(2)"); // le bloc du timer
-  const fullscreenBtn = document.querySelector("#fullscreen"); // btn fullscreen
-  if (!document.fullscreenElement) {
-    el.requestFullscreen?.()
-    config.style.display = "none";
-    dirSel.style.display = "none";
-    modeSel.style.display = "none";
-    timerCard.classList.add("fullscreen");
-    fullscreenBtn.classList.add("fullscreen");
-  } else {
-    document.exitFullscreen?.();
-    config.style.display = "";
-    dirSel.style.display = "";
-    modeSel.style.display = "";
-    timerCard.classList.remove("fullscreen");
-    fullscreenBtn.classList.remove("fullscreen");
-  }
+  fullscreenBtn.addEventListener("click", () => {
+    const el = document.documentElement;
+    const timerCard = document.querySelector(".card:nth-of-type(2)"); // le bloc du timer
+    const fullscreenBtn = document.querySelector("#fullscreen"); // btn fullscreen
+    if (!document.fullscreenElement) {
+      el.requestFullscreen?.()
+      config.style.display = "none";
+      dirSel.style.display = "none";
+      modeSel.style.display = "none";
+      timerCard.classList.add("fullscreen");
+      fullscreenBtn.classList.add("fullscreen");
+    } else {
+      document.exitFullscreen?.();
+      config.style.display = "";
+      dirSel.style.display = "";
+      modeSel.style.display = "";
+      timerCard.classList.remove("fullscreen");
+      fullscreenBtn.classList.remove("fullscreen");
+    }
 //   !document.fullscreenElement ? el.requestFullscreen?.() : document.exitFullscreen?.();
 });
 

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Training Timer — EMOM • E2MOM • Tabata • AMRAP</title>
+  <link rel="icon" type="image/png" href="./image/Copilot_20250906_161911.png">
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#16ff72" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Training Timer</h1>
+      <div class="row">
+          <select id="mode">
+            <option value="EMOM">EMOM</option>
+            <option value="E2MOM">E2MOM</option>
+            <option value="TABATA">Tabata</option>
+            <option value="AMRAP">AMRAP</option>
+            <option value="FORTIME">For Time</option>
+          </select>
+          <select id="direction">
+            <option value="UP">Montant</option>
+            <option value="DOWN">Descendant</option>
+          </select>
+          <button class="btn" id="fullscreen">Plein écran</button>
+      </div>
+    </header>
+
+    <!-- Configuration -->
+    <section class="card" id="config">
+      <div data-mode="FORTIME" class="cfg" style="display:none">
+        <label>Durée totale (minutes)</label>
+        <input type="number" id="forTimeMinutes" min="1" max="180" value="20" />
+        <label>Pause toutes les (minutes)</label>
+        <input type="number" id="pauseEveryMin" min="1" max="60" value="5" />
+        <label>Durée de la pause (secondes)</label>
+        <input type="number" id="pauseDurationSec" min="5" max="180" value="30" />
+      </div>
+      <div id="inputs" class="grid">
+        <!-- EMOM & E2MOM -->
+        <div class="cfg" data-mode="EMOM E2MOM">
+          <label>Durée totale (minutes)</label>
+          <input type="number" id="emomMinutes" min="1" max="180" value="12" />
+        </div>
+
+        <!-- TABATA -->
+        <div class="cfg" data-mode="TABATA" style="display:none">
+          <div class="row">
+            <label>Travail (s)
+              <input type="number" id="tabataWork" min="5" max="300" value="20" />
+            </label>
+            <label>Repos (s)
+              <input type="number" id="tabataRest" min="5" max="300" value="10" />
+            </label>
+            <label>Cycles
+              <input type="number" id="tabataCycles" min="1" max="50" value="8" />
+            </label>
+          </div>
+        </div>
+
+        <!-- AMRAP -->
+        <div class="cfg" data-mode="AMRAP" style="display:none">
+          <label>Cap (minutes, 0 = illimité)</label>
+          <input type="number" id="amrapCap" min="0" max="240" value="20" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Display -->
+    <section class="card">
+      <div class="stage">
+        <div id="phase" class="phase">Prêt</div>
+          <div class="time-line">
+            <span id="roundBadge" class="round-badge" style="display:none"></span>
+            <span id="display" class="time">00:00</span>
+          </div>
+        <div id="meta" class="info">—</div>
+      </div>
+      <div class="controls">
+        <button class="btn primary" id="start">Start</button>
+        <!--<button class="btn" id="pause">Pause</button> -->
+        <button class="btn" id="reset">Reset</button>
+        <button class="btn warn" id="roundBtn" style="display:none">Round</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Overlay compte à rebours 10s -->
+  <div id="overlay" class="overlay">
+    <div id="countdown" class="countdown">10</div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
